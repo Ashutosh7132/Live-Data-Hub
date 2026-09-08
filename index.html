@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LiveData - Real-Time Global Statistics</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <!-- Live Status Bar -->
+    <div class="live-status">
+        <span class="live-dot"></span>
+        <span>Live Data Feed</span>
+        <span id="lastUpdated" class="last-updated">Connecting...</span>
+        <button class="refresh-btn" onclick="refreshAllData()">🔄 Refresh Now</button>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">📡 LiveData Hub</div>
+            <ul class="nav-menu">
+                <li><a href="#home" class="active">Dashboard</a></li>
+                <li><a href="#crypto">Cryptocurrency</a></li>
+                <li><a href="#weather">Weather</a></li>
+                <li><a href="#population">World Population</a></li>
+                <li><a href="#exchange">Exchange Rates</a></li>
+                <li><a href="#covid">COVID-19 Stats</a></li>
+            </ul>
+            <div class="hamburger">☰</div>
+        </div>
+    </nav>
+
+    <!-- Hero Section with Live Clock -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>Real-Time Global Data</h1>
+            <p>Live statistics updating every few seconds from multiple data sources</p>
+            <div class="live-clock" id="liveClock">00:00:00</div>
+            <div class="date-display" id="dateDisplay">Loading date...</div>
+        </div>
+    </section>
+
+    <!-- Quick Stats Dashboard -->
+    <section class="quick-stats">
+        <div class="stats-grid">
+            <div class="stat-card" id="worldPopulationCard">
+                <div class="stat-icon">🌍</div>
+                <div class="stat-content">
+                    <h3>World Population</h3>
+                    <p class="stat-value" id="worldPopulation">Loading...</p>
+                    <p class="stat-change" id="populationChange">+0 this minute</p>
+                </div>
+            </div>
+            <div class="stat-card" id="btcPriceCard">
+                <div class="stat-icon">₿</div>
+                <div class="stat-content">
+                    <h3>Bitcoin Price</h3>
+                    <p class="stat-value" id="btcPrice">Loading...</p>
+                    <p class="stat-change" id="btcChange">Loading...</p>
+                </div>
+            </div>
+            <div class="stat-card" id="globalTempCard">
+                <div class="stat-icon">🌡️</div>
+                <div class="stat-content">
+                    <h3>Global Temperature</h3>
+                    <p class="stat-value" id="globalTemp">Loading...</p>
+                    <p class="stat-change">Anomaly from baseline</p>
+                </div>
+            </div>
+            <div class="stat-card" id="covidCasesCard">
+                <div class="stat-icon">🦠</div>
+                <div class="stat-content">
+                    <h3>COVID-19 Cases</h3>
+                    <p class="stat-value" id="covidCases">Loading...</p>
+                    <p class="stat-change" id="covidNew">Loading...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cryptocurrency Section -->
+    <section id="crypto" class="data-section">
+        <h2>Live Cryptocurrency Prices</h2>
+        <p class="section-description">Real-time prices from CoinGecko API (updates every 30 seconds)</p>
+        <div class="crypto-grid" id="cryptoGrid">
+            <!-- Crypto cards will be loaded here -->
+        </div>
+        <div class="chart-container">
+            <canvas id="cryptoChart"></canvas>
+        </div>
+    </section>
+
+    <!-- Weather Section -->
+    <section id="weather" class="data-section">
+        <h2>Live Weather Data</h2>
+        <p class="section-description">Current weather in major cities worldwide (OpenWeatherMap API)</p>
+        <div class="weather-grid" id="weatherGrid">
+            <!-- Weather cards will be loaded here -->
+        </div>
+    </section>
+
+    <!-- World Population Section -->
+    <section id="population" class="data-section">
+        <h2>World Population Counter</h2>
+        <p class="section-description">Live population estimates from Worldometer</p>
+        <div class="population-container">
+            <div class="population-display">
+                <h3>Current World Population</h3>
+                <div class="population-number" id="populationCounter">7,900,000,000</div>
+                <div class="population-stats">
+                    <div class="pop-stat">
+                        <span>Births today:</span>
+                        <strong id="birthsToday">0</strong>
+                    </div>
+                    <div class="pop-stat">
+                        <span>Deaths today:</span>
+                        <strong id="deathsToday">0</strong>
+                    </div>
+                    <div class="pop-stat">
+                        <span>Net growth today:</span>
+                        <strong id="netGrowth">0</strong>
+                    </div>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="populationChart"></canvas>
+            </div>
+        </div>
+    </section>
+
+    <!-- Exchange Rates Section -->
+    <section id="exchange" class="data-section">
+        <h2>Live Exchange Rates</h2>
+        <p class="section-description">USD to major currencies (ExchangeRate API - updates hourly)</p>
+        <div class="exchange-container">
+            <table id="exchangeTable">
+                <thead>
+                    <tr>
+                        <th>Currency</th>
+                        <th>Code</th>
+                        <th>Rate (1 USD =)</th>
+                        <th>Change 24h</th>
+                    </tr>
+                </thead>
+                <tbody id="exchangeBody">
+                    <!-- Exchange rates will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- COVID-19 Statistics -->
+    <section id="covid" class="data-section">
+        <h2>COVID-19 Global Statistics</h2>
+        <p class="section-description">Live data from disease.sh API (updates daily)</p>
+        <div class="covid-stats">
+            <div class="covid-stat-card">
+                <h3>Total Cases</h3>
+                <p id="totalCases">Loading...</p>
+            </div>
+            <div class="covid-stat-card">
+                <h3>Total Deaths</h3>
+                <p id="totalDeaths">Loading...</p>
+            </div>
+            <div class="covid-stat-card">
+                <h3>Total Recovered</h3>
+                <p id="totalRecovered">Loading...</p>
+            </div>
+            <div class="covid-stat-card">
+                <h3>Active Cases</h3>
+                <p id="activeCases">Loading...</p>
+            </div>
+        </div>
+        <div class="chart-container">
+            <canvas id="covidChart"></canvas>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Data Sources</h3>
+                <ul>
+                    <li>CoinGecko API - Cryptocurrency</li>
+                    <li>OpenWeatherMap - Weather</li>
+                    <li>Worldometer - Population</li>
+                    <li>ExchangeRate API - Currency</li>
+                    <li>disease.sh - COVID-19</li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Update Frequency</h3>
+                <ul>
+                    <li>Cryptocurrency: Every 30s</li>
+                    <li>Weather: Every 10 min</li>
+                    <li>Population: Real-time</li>
+                    <li>Exchange Rates: Hourly</li>
+                    <li>COVID-19: Daily</li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>About</h3>
+                <p>LiveData Hub aggregates real-time data from multiple public APIs to provide current global statistics.</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 LiveData Hub. All data is fetched from public APIs in real-time.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
